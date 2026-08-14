@@ -1,4 +1,4 @@
-import type { ChatMessage, LessonDetail, Module, Profile, TutorMeta } from "./types";
+import type { ChatMessage, LessonDetail, Module, Profile, TutorMeta, TutorReply } from "./types";
 
 const API_BASE = import.meta.env["VITE_API_BASE_URL"] ?? "http://localhost:8000";
 
@@ -36,8 +36,9 @@ export const api = {
     moduleId?: string;
     lessonId?: string;
     selectedPart?: string;
+    partNames?: string[];
   }) =>
-    request<{ text: string }>("/api/tutor/chat", {
+    request<TutorReply>("/api/tutor/chat", {
       method: "POST",
       body: JSON.stringify(payload),
     }),

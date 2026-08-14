@@ -1,11 +1,10 @@
 import { Send, Sparkles } from "lucide-react";
 import { useState, type FormEvent } from "react";
+import { MessageEvidence } from "@/components/bio/FloatingTutor";
+import type { ChatMessage } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export interface ChatMessage {
-  role: "user" | "assistant";
-  text: string;
-}
+export type { ChatMessage };
 
 export function AIChatPanel({
   messages,
@@ -40,10 +39,10 @@ export function AIChatPanel({
         </p>
       ) : (
         <p className="mb-3 shrink-0 text-[11px] text-muted-foreground">
-          Click a part on the model, then ask about it.
+          Click a part on the model, then ask about it. I can move the model and pull sources.
         </p>
       )}
-      <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+      <div className="scrollbar-slim min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
         {messages.map((message, index) => (
           <div
             key={`${message.role}-${index}`}
@@ -63,12 +62,13 @@ export function AIChatPanel({
                   Inochi Tutor
                 </p>
               ) : null}
-              <p>{message.text}</p>
+              <p className="whitespace-pre-wrap">{message.text}</p>
+              <MessageEvidence message={message} />
             </div>
           </div>
         ))}
         {pending ? (
-          <p className="text-xs text-muted-foreground">The tutor is thinking…</p>
+          <p className="text-xs text-muted-foreground">Looking up sources and moving the model…</p>
         ) : null}
       </div>
 
@@ -93,7 +93,7 @@ export function AIChatPanel({
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           placeholder={
-            selectedPart ? `Ask about ${selectedPart}...` : "Select a part, then ask about it..."
+            selectedPart ? `Ask about ${selectedPart}...` : "Ask about the model, or select a part..."
           }
           disabled={pending}
           className="h-11 flex-1 rounded-2xl border border-[var(--glass-border)] bg-white/80 px-4 text-sm outline-none placeholder:text-muted-foreground focus:border-ring/50"

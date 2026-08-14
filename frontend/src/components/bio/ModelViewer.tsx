@@ -2,6 +2,7 @@ import { Expand, Maximize2, RotateCw } from "lucide-react";
 import { Suspense, lazy, useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import type { ModelPart } from "@/lib/model-hierarchy";
 import { displayPartLabel } from "@/lib/model-hierarchy";
+import type { CameraCommand } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const ModelCanvas = lazy(() => import("./ModelCanvas"));
@@ -10,8 +11,11 @@ export interface ModelViewerProps {
   src: string;
   isolateNodes?: string[];
   selectedName?: string | null;
-  onSelect?: (name: string | null) => void;
-  onHierarchy?: (parts: ModelPart[]) => void;
+  hiddenNames?: string[];
+  cameraCommand?: CameraCommand | null;
+  floatingGuide?: ReactNode;
+  onSelect?: ((name: string | null) => void) | undefined;
+  onHierarchy?: ((parts: ModelPart[]) => void) | undefined;
   modelName?: string;
   modelType?: string;
   fullscreen?: boolean;
@@ -26,6 +30,9 @@ export function ModelViewer({
   src,
   isolateNodes = [],
   selectedName = null,
+  hiddenNames = [],
+  cameraCommand = null,
+  floatingGuide,
   onSelect,
   onHierarchy,
   modelName = "3D Model",
@@ -99,6 +106,9 @@ export function ModelViewer({
               src={src}
               isolateNodes={isolateNodes}
               selectedName={selectedName}
+              hiddenNames={hiddenNames}
+              cameraCommand={cameraCommand}
+              floatingGuide={floatingGuide}
               onSelect={onSelect}
               onHierarchy={onHierarchy}
             />

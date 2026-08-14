@@ -59,9 +59,38 @@ class Profile(ApiModel):
     initials: str
 
 
+class TutorAction(ApiModel):
+    type: str
+    part: str | None = None
+    yaw: float | None = None
+    pitch: float | None = None
+
+
+class TutorSource(ApiModel):
+    title: str
+    authors: str = ""
+    year: str = ""
+    venue: str = ""
+    url: str
+    source: str = "PubMed"
+    lead: str = ""
+
+
+class TutorImage(ApiModel):
+    url: str
+    thumb_url: str = ""
+    caption: str = ""
+    alt: str = ""
+    source: str = "Wikipedia"
+    source_url: str = ""
+    license: str = ""
+
+
 class ChatMessage(ApiModel):
     role: ChatRole
     text: str
+    sources: list[TutorSource] = Field(default_factory=list)
+    images: list[TutorImage] = Field(default_factory=list)
 
 
 class TutorChatRequest(ApiModel):
@@ -70,10 +99,14 @@ class TutorChatRequest(ApiModel):
     module_id: str | None = None
     lesson_id: str | None = None
     selected_part: str | None = None
+    part_names: list[str] = Field(default_factory=list)
 
 
 class TutorChatResponse(ApiModel):
     text: str
+    actions: list[TutorAction] = Field(default_factory=list)
+    sources: list[TutorSource] = Field(default_factory=list)
+    images: list[TutorImage] = Field(default_factory=list)
 
 
 class Conversation(ApiModel):

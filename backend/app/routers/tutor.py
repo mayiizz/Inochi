@@ -26,5 +26,12 @@ def tutor_meta() -> TutorMeta:
 @router.post("/chat", response_model=TutorChatResponse)
 def tutor_chat(body: TutorChatRequest) -> TutorChatResponse:
     history = [item.model_dump() for item in body.history]
-    text = complete_chat(body.text, history, body.module_id, body.lesson_id, body.selected_part)
-    return TutorChatResponse(text=text)
+    payload = complete_chat(
+        body.text,
+        history,
+        body.module_id,
+        body.lesson_id,
+        body.selected_part,
+        body.part_names,
+    )
+    return TutorChatResponse.model_validate(payload)
