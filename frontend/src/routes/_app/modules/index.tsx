@@ -12,7 +12,7 @@ export const Route = createFileRoute("/_app/modules/")({
   component: ModulesPage,
 });
 
-const categories = ["All", "Organs", "Systems"] as const;
+const categories = ["All", "Organs", "Systems", "Cells"] as const;
 const difficulties: Array<"All" | Difficulty> = ["All", "Beginner", "Intermediate", "Advanced"];
 
 function ModulesPage() {
@@ -40,7 +40,7 @@ function ModulesPage() {
       <PageHeader
         eyebrow="Catalogue"
         title="Explore BioScience"
-        subtitle="Anatomical systems, each with a live 3D model."
+        subtitle="Organs, systems and cells, each with a live 3D model."
       />
       <SearchBar
         value={query}

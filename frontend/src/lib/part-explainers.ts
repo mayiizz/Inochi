@@ -314,6 +314,136 @@ const LOOKUP: Record<string, Entry> = {
     summary:
       "Peripheral nerves carry motor, sensory, and autonomic fibres between the central nervous system and the rest of the body.",
   },
+  "plasma membrane": {
+    role: "Cell boundary",
+    summary:
+      "The plasma membrane is a phospholipid bilayer that separates the cell from its surroundings. It controls what enters and leaves and carries receptors and transporters.",
+  },
+  "cell wall": {
+    role: "Plant structure",
+    summary:
+      "The cell wall is a rigid cellulose layer outside the plasma membrane. It supports the plant cell, resists turgor, and is pierced by plasmodesmata.",
+  },
+  cytoplasm: {
+    role: "Cell interior",
+    summary:
+      "Cytoplasm is the cytosol plus organelles inside the plasma membrane. Metabolic reactions and vesicle traffic run through it.",
+  },
+  nucleus: {
+    role: "Organelle",
+    summary:
+      "The nucleus houses most of the cell's DNA. Transcription happens here; mRNA then leaves through nuclear pores to be translated.",
+  },
+  nucleolus: {
+    role: "Nuclear region",
+    summary:
+      "The nucleolus is a dense region inside the nucleus where ribosomal RNA is transcribed and ribosome subunits are assembled.",
+  },
+  "nuclear envelope": {
+    role: "Organelle membrane",
+    summary:
+      "The nuclear envelope is a double membrane around the nucleus. Nuclear pores in it let RNA and proteins move between nucleoplasm and cytosol.",
+  },
+  mitochondrion: {
+    role: "Energy organelle",
+    summary:
+      "Mitochondria oxidise fuels to make ATP. They have an outer membrane, a folded inner membrane (cristae), and a matrix where the citric-acid cycle runs.",
+  },
+  mitochondria: {
+    role: "Energy organelle",
+    summary:
+      "Mitochondria oxidise fuels to make ATP. They have an outer membrane, a folded inner membrane (cristae), and a matrix where the citric-acid cycle runs.",
+  },
+  cristae: {
+    role: "Inner membrane folds",
+    summary:
+      "Cristae are folds of the mitochondrial inner membrane. They increase surface area for the electron-transport chain and ATP synthase.",
+  },
+  matrix: {
+    role: "Mitochondrial compartment",
+    summary:
+      "The mitochondrial matrix is the innermost compartment. It holds enzymes of the citric-acid cycle, mitochondrial DNA, and ribosomes.",
+  },
+  "outer membrane": {
+    role: "Organelle membrane",
+    summary:
+      "The mitochondrial outer membrane faces the cytosol. Porins make it relatively permeable compared with the inner membrane.",
+  },
+  "mitochondrial dna": {
+    role: "Organelle genome",
+    summary:
+      "Mitochondrial DNA is a small circular genome inside the matrix. It encodes a few respiratory proteins; most mitochondrial proteins are imported from the nucleus.",
+  },
+  granule: {
+    role: "Matrix inclusion",
+    summary:
+      "Mitochondrial granules are dense deposits in the matrix. They store ions and proteins and are visible as discrete bodies on this model.",
+  },
+  chloroplast: {
+    role: "Photosynthetic organelle",
+    summary:
+      "Chloroplasts capture light and fix carbon. They have inner and outer membranes; thylakoids inside hold the photosynthetic machinery.",
+  },
+  vacuole: {
+    role: "Storage organelle",
+    summary:
+      "The central vacuole stores water, ions and metabolites. In plant cells it maintains turgor against the wall.",
+  },
+  plasmodesma: {
+    role: "Plant junction",
+    summary:
+      "Plasmodesmata are cytoplasmic channels through the cell wall. They let neighbouring plant cells share solutes and signals.",
+  },
+  "rough er": {
+    role: "Endomembrane organelle",
+    summary:
+      "Rough endoplasmic reticulum is studded with ribosomes. It synthesises proteins destined for membranes, lysosomes, or secretion.",
+  },
+  "smooth er": {
+    role: "Endomembrane organelle",
+    summary:
+      "Smooth endoplasmic reticulum lacks ribosomes. It synthesises lipids, stores calcium, and detoxifies some compounds.",
+  },
+  golgi: {
+    role: "Endomembrane organelle",
+    summary:
+      "The Golgi apparatus modifies, sorts and packages proteins and lipids arriving from the ER, then ships them in vesicles.",
+  },
+  ribosome: {
+    role: "Protein synthesis",
+    summary:
+      "Ribosomes read mRNA and assemble amino acids into proteins. They may be free in the cytosol or bound to rough ER.",
+  },
+  lysosome: {
+    role: "Digestive organelle",
+    summary:
+      "Lysosomes are acidic vesicles packed with hydrolases. They break down macromolecules, worn organelles, and material taken in by endocytosis.",
+  },
+  peroxisome: {
+    role: "Metabolic organelle",
+    summary:
+      "Peroxisomes run oxidative reactions, including breakdown of fatty acids, and contain catalase to handle hydrogen peroxide.",
+  },
+  vesicle: {
+    role: "Membrane traffic",
+    summary:
+      "Vesicles are small membrane sacs that carry cargo between ER, Golgi, plasma membrane and endosomes.",
+  },
+  endosome: {
+    role: "Membrane traffic",
+    summary:
+      "Endosomes sort material taken in from the cell surface. Some cargo recycles to the membrane; some is sent to lysosomes.",
+  },
+  centriole: {
+    role: "Cytoskeleton organiser",
+    summary:
+      "Centrioles are paired cylinders of microtubules. Together they form the centrosome that organises the mitotic spindle.",
+  },
+  centrosome: {
+    role: "Microtubule organising centre",
+    summary:
+      "The centrosome is the main microtubule-organising centre in animal cells. It duplicates before mitosis and helps build the spindle.",
+  },
 };
 
 function normalize(name: string) {
@@ -327,7 +457,7 @@ function normalize(name: string) {
 
 export function explainPart(rawName: string): PartExplainer {
   const title = displayPartLabel(rawName);
-  const haystack = normalize(rawName);
+  const haystack = `${normalize(rawName)} ${normalize(title)}`;
   let bestKey = "";
   let best: Entry | undefined;
 
@@ -341,7 +471,7 @@ export function explainPart(rawName: string): PartExplainer {
   if (!best) {
     return {
       title,
-      role: "Anatomical structure",
+      role: "Biological structure",
       summary: `${title} is a labeled region on this model. Hide neighbouring parts in the list to see it more clearly, or ask the AI assistant for a deeper explanation.`,
     };
   }

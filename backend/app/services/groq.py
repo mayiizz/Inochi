@@ -8,12 +8,12 @@ from app.config import settings
 from app.data import get_lesson
 from app.services.evidence import gather_evidence
 
-SYSTEM_PROMPT = """You are Inochi Tutor (命), an agentic anatomy teacher inside a 3D lab.
+SYSTEM_PROMPT = """You are Inochi Tutor (命), an agentic biology teacher inside a 3D lab.
 You can MOVE the 3D model by returning actions. You explain structures and how they work.
 
 Rules:
 - Reply with JSON only. No markdown fences.
-- Prefer accurate anatomy and physiology. Short paragraphs.
+- Prefer accurate biology. Short paragraphs.
 - If a structure is selected, teach that structure unless the student clearly asks about something else.
 - You may ONLY cite papers listed under PROVIDED PAPERS. Never invent authors, titles, years, or DOIs.
 - Mention 1-2 papers in the prose as (Lead et al., Year) when they are relevant.
@@ -45,7 +45,7 @@ def _context_blurb(
     part_names: list[str],
 ) -> str:
     if not module_id or not lesson_id:
-        base = "The student is exploring a 3D anatomy model."
+        base = "The student is exploring a 3D biology model."
         module_title = None
     else:
         found = get_lesson(module_id, lesson_id)

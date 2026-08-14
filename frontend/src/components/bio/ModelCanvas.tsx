@@ -1,7 +1,6 @@
 import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from "react";
 import { Canvas, useFrame, useThree, type ThreeEvent } from "@react-three/fiber";
 import {
-  Center,
   ContactShadows,
   Html,
   OrbitControls,
@@ -13,10 +12,13 @@ import { Box3, BufferGeometry, Color, Group, Spherical, Vector3 } from "three";
 import { clone } from "three/examples/jsm/utils/SkeletonUtils.js";
 import {
   buildPartTree,
+  canonicalPartName,
   isAnnotationName,
+  isBakedLabelName,
   isGroupFolderName,
+  isRibosomeInstance,
   isSelectableName,
-  namesMatch,
+  partMatches,
   sourceName,
   type ModelPart,
 } from "@/lib/model-hierarchy";
@@ -45,7 +47,7 @@ function pickSelectableName(object: Object3D) {
   let current: Object3D | null = object;
   while (current) {
     const name = sourceName(current);
-    if (isSelectableName(name)) return name;
+    if (isSelectableName(name)) return canonicalPartName(name);
     current = current.parent;
   }
   return null;
@@ -54,7 +56,7 @@ function pickSelectableName(object: Object3D) {
 function isInSelection(object: Object3D, selectedName: string) {
   let current: Object3D | null = object;
   while (current) {
-    if (namesMatch(sourceName(current), selectedName) || namesMatch(current.name, selectedName)) {
+    if (partMatches(sourceName(current), selectedName) || partMatches(current.name, selectedName)) {
       return true;
     }
     current = current.parent;
@@ -67,7 +69,14 @@ function enhanceMaterials(root: Object3D) {
     const mesh = node as Mesh;
     if (!mesh.isMesh) return;
     const original = sourceName(mesh);
-    if (isAnnotationName(original) || isGroupFolderName(original)) return;
+    if (
+      isAnnotationName(original) ||
+      isGroupFolderName(original) ||
+      isBakedLabelName(original) ||
+      isRibosomeInstance(original)
+    ) {
+      return;
+    }
     if (!mesh.geometry.getAttribute("position")) return;
     mesh.castShadow = true;
     mesh.receiveShadow = true;
@@ -118,7 +127,7 @@ function findObject(root: Object3D, name: string) {
   let match: Object3D | undefined;
   root.traverse((node) => {
     if (match) return;
-    if (namesMatch(sourceName(node), name) || namesMatch(node.name, name)) match = node;
+    if (partMatches(sourceName(node), name) || partMatches(node.name, name)) match = node;
   });
   return match;
 }
@@ -126,7 +135,7 @@ function findObject(root: Object3D, name: string) {
 function stripEmbeddedLabels(root: Object3D) {
   root.traverse((node) => {
     const original = sourceName(node);
-    if (isAnnotationName(original)) {
+    if (isAnnotationName(original) || isBakedLabelName(original)) {
       node.visible = false;
       return;
     }
@@ -154,6 +163,18 @@ function extractIsolated(source: Object3D, names: string[]) {
   if (container.children.length === 0) return source;
   stripEmbeddedLabels(container);
   return container;
+}
+
+function centerAtOrigin(object: Object3D) {
+  object.updateMatrixWorld(true);
+  const box = new Box3().setFromObject(object);
+  if (box.isEmpty()) return object;
+  const center = box.getCenter(new Vector3());
+  object.position.x -= center.x;
+  object.position.y -= center.y;
+  object.position.z -= center.z;
+  object.updateMatrixWorld(true);
+  return object;
 }
 
 function toNamed(node: Object3D): { name: string; children: ReturnType<typeof toNamed>[] } {
@@ -199,17 +220,21 @@ function FocusOnSelection({
   root,
   selectedName,
   cameraCommand,
+  frameNonce = 0,
 }: {
   root: Object3D;
   selectedName: string | null;
   cameraCommand: CameraCommand | null;
+  frameNonce?: number;
 }) {
   const camera = useThree((state) => state.camera);
   const controls = useThree((state) => state.controls);
   const invalidate = useThree((state) => state.invalidate);
+  const size = useThree((state) => state.size);
   const didInitial = useRef(false);
   const prevSelected = useRef<string | null>(null);
   const prevCommand = useRef(0);
+  const prevNonce = useRef(0);
   const anim = useRef<{
     t: number;
     fromPos: Vector3;
@@ -218,14 +243,22 @@ function FocusOnSelection({
     toTarget: Vector3;
   } | null>(null);
 
+  useEffect(() => {
+    didInitial.current = false;
+    prevSelected.current = null;
+  }, [root]);
+
   useLayoutEffect(() => {
     const cam = camera as PerspectiveCamera;
     if (!("isPerspectiveCamera" in cam) || !cam.isPerspectiveCamera) return;
     const orbit = controls as OrbitLike | null;
     if (!orbit?.target) return;
+    if (!didInitial.current) return;
 
     const startFit = (box: Box3, margin: number) => {
       if (box.isEmpty()) return;
+      cam.aspect = size.width / Math.max(size.height, 1);
+      cam.updateProjectionMatrix();
       const goal = fitCameraToBox(cam, box, margin);
       anim.current = {
         t: 0,
@@ -237,10 +270,16 @@ function FocusOnSelection({
       invalidate();
     };
 
+    if (frameNonce !== prevNonce.current) {
+      prevNonce.current = frameNonce;
+      startFit(new Box3().setFromObject(root), 1.45);
+      return;
+    }
+
     if (cameraCommand && cameraCommand.id !== prevCommand.current) {
       prevCommand.current = cameraCommand.id;
       if (cameraCommand.kind === "reset") {
-        startFit(new Box3().setFromObject(root), 1.4);
+        startFit(new Box3().setFromObject(root), 1.45);
         return;
       }
       if (cameraCommand.kind === "focus") {
@@ -266,13 +305,6 @@ function FocusOnSelection({
       }
     }
 
-    if (!didInitial.current) {
-      didInitial.current = true;
-      prevSelected.current = selectedName;
-      startFit(new Box3().setFromObject(root), 1.4);
-      return;
-    }
-
     if (!selectedName || selectedName === prevSelected.current) {
       prevSelected.current = selectedName;
       return;
@@ -282,15 +314,36 @@ function FocusOnSelection({
     const target = findObject(root, selectedName);
     if (!target) return;
     startFit(frameBox(root, target), 1.25);
-  }, [camera, cameraCommand, controls, invalidate, root, selectedName]);
+  }, [camera, cameraCommand, controls, frameNonce, invalidate, root, selectedName, size.height, size.width]);
 
   useFrame((_, delta) => {
+    const cam = camera as PerspectiveCamera;
+    const orbit = controls as OrbitLike | null;
+
+    if (!didInitial.current && orbit?.target && "isPerspectiveCamera" in cam && cam.isPerspectiveCamera) {
+      if (size.width >= 8 && size.height >= 8) {
+        const box = new Box3().setFromObject(root);
+        if (!box.isEmpty()) {
+          cam.aspect = size.width / size.height;
+          cam.updateProjectionMatrix();
+          const goal = fitCameraToBox(cam, box, 1.45);
+          cam.position.copy(goal.position);
+          orbit.target.copy(goal.target);
+          orbit.update();
+          cam.updateMatrixWorld();
+          didInitial.current = true;
+          prevSelected.current = selectedName;
+          prevNonce.current = frameNonce;
+          invalidate();
+        }
+      }
+    }
+
     const current = anim.current;
     if (!current) return;
     current.t = Math.min(1, current.t + delta / 0.4);
     const k = 1 - (1 - current.t) ** 3;
     camera.position.lerpVectors(current.fromPos, current.toPos, k);
-    const orbit = controls as OrbitLike | null;
     if (orbit?.target) {
       orbit.target.lerpVectors(current.fromTarget, current.toTarget, k);
       orbit.update();
@@ -305,15 +358,19 @@ function FocusOnSelection({
 
 function applyVisibility(root: Object3D, hiddenNames: string[]) {
   root.traverse((node) => {
-    if (isAnnotationName(sourceName(node))) {
+    const original = sourceName(node);
+    if (isAnnotationName(original) || isBakedLabelName(original)) {
       node.visible = false;
       return;
     }
     node.visible = true;
   });
   for (const name of hiddenNames) {
-    const found = findObject(root, name);
-    if (found) found.visible = false;
+    root.traverse((node) => {
+      if (partMatches(sourceName(node), name) || partMatches(node.name, name)) {
+        node.visible = false;
+      }
+    });
   }
 }
 
@@ -323,6 +380,7 @@ function GltfModel({
   selectedName,
   hiddenNames,
   cameraCommand,
+  frameNonce,
   floatingGuide,
   onSelect,
   onHierarchy,
@@ -332,6 +390,7 @@ function GltfModel({
   selectedName: string | null;
   hiddenNames: string[];
   cameraCommand: CameraCommand | null;
+  frameNonce: number;
   floatingGuide?: ReactNode;
   onSelect?: ((name: string | null) => void) | undefined;
   onHierarchy?: ((parts: ModelPart[]) => void) | undefined;
@@ -344,7 +403,7 @@ function GltfModel({
     const copy = clone(scene);
     const isolated = extractIsolated(copy, isolateNodes);
     enhanceMaterials(isolated);
-    return isolated;
+    return centerAtOrigin(isolated);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- isolateKey captures isolateNodes
   }, [scene, isolateKey]);
 
@@ -382,21 +441,24 @@ function GltfModel({
 
   return (
     <>
-      <Center>
-        <group
-          onPointerDown={handlePointerDown}
-          onClick={handleClick}
-          onPointerOver={() => {
-            document.body.style.cursor = "pointer";
-          }}
-          onPointerOut={() => {
-            document.body.style.cursor = "auto";
-          }}
-        >
-          <primitive object={cloned} />
-        </group>
-      </Center>
-      <FocusOnSelection root={cloned} selectedName={selectedName} cameraCommand={cameraCommand} />
+      <group
+        onPointerDown={handlePointerDown}
+        onClick={handleClick}
+        onPointerOver={() => {
+          document.body.style.cursor = "pointer";
+        }}
+        onPointerOut={() => {
+          document.body.style.cursor = "auto";
+        }}
+      >
+        <primitive object={cloned} />
+      </group>
+      <FocusOnSelection
+        root={cloned}
+        selectedName={selectedName}
+        cameraCommand={cameraCommand}
+        frameNonce={frameNonce}
+      />
       {selectedName && floatingGuide ? (
         <TutorAnchor root={cloned} selectedName={selectedName}>
           {floatingGuide}
@@ -412,6 +474,7 @@ export default function ModelCanvas({
   selectedName = null,
   hiddenNames = [],
   cameraCommand = null,
+  frameNonce = 0,
   floatingGuide,
   onSelect,
   onHierarchy,
@@ -421,6 +484,7 @@ export default function ModelCanvas({
   selectedName?: string | null;
   hiddenNames?: string[];
   cameraCommand?: CameraCommand | null;
+  frameNonce?: number;
   floatingGuide?: ReactNode;
   onSelect?: ((name: string | null) => void) | undefined;
   onHierarchy?: ((parts: ModelPart[]) => void) | undefined;
@@ -450,6 +514,7 @@ export default function ModelCanvas({
           selectedName={selectedName}
           hiddenNames={hiddenNames}
           cameraCommand={cameraCommand}
+          frameNonce={frameNonce}
           floatingGuide={floatingGuide}
           onSelect={onSelect}
           onHierarchy={onHierarchy}
@@ -460,6 +525,7 @@ export default function ModelCanvas({
         makeDefault
         enableDamping
         dampingFactor={0.08}
+        target={[0, 0, 0]}
         minDistance={0.01}
         maxDistance={500}
         zoomSpeed={1.1}

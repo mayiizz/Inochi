@@ -71,8 +71,8 @@ function LandingPage() {
             Master Biology Through Intelligent Exploration
           </h1>
           <p className="mt-5 max-w-xl text-base leading-relaxed text-muted-foreground">
-            Inochi combines AI tutoring and interactive 3D models of the heart, skeleton,
-            viscera and nervous system in one calm scientific workspace.
+            Inochi combines AI tutoring and interactive 3D models of organs, viscera, the nervous
+            system and cells in one calm scientific workspace.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link

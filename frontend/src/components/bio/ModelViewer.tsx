@@ -46,7 +46,7 @@ export function ModelViewer({
 }: ModelViewerProps) {
   const shellRef = useRef<HTMLDivElement>(null);
   const [mounted, setMounted] = useState(false);
-  const [viewKey, setViewKey] = useState(0);
+  const [frameNonce, setFrameNonce] = useState(0);
   const isolateKey = isolateNodes.join("|");
 
   useEffect(() => {
@@ -54,12 +54,16 @@ export function ModelViewer({
   }, []);
 
   useEffect(() => {
-    setViewKey((current) => current + 1);
+    setFrameNonce(0);
   }, [src, isolateKey]);
+
+  const fitView = useCallback(() => {
+    setFrameNonce((current) => current + 1);
+  }, []);
 
   const resetView = useCallback(() => {
     onSelect?.(null);
-    setViewKey((current) => current + 1);
+    setFrameNonce((current) => current + 1);
   }, [onSelect]);
 
   const toggleFullscreen = useCallback(() => {
@@ -102,12 +106,13 @@ export function ModelViewer({
         {mounted ? (
           <Suspense fallback={<ViewportFallback />}>
             <ModelCanvas
-              key={`${src}-${isolateKey}-${viewKey}`}
+              key={`${src}-${isolateKey}`}
               src={src}
               isolateNodes={isolateNodes}
               selectedName={selectedName}
               hiddenNames={hiddenNames}
               cameraCommand={cameraCommand}
+              frameNonce={frameNonce}
               floatingGuide={floatingGuide}
               onSelect={onSelect}
               onHierarchy={onHierarchy}
@@ -143,7 +148,7 @@ export function ModelViewer({
           <button
             type="button"
             title="Fit"
-            onClick={resetView}
+            onClick={fitView}
             className="flex items-center gap-1.5 rounded-xl px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-primary"
           >
             <Expand className="size-4" strokeWidth={1.7} />

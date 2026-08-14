@@ -20,7 +20,7 @@ export function Navbar() {
           <button
             type="button"
             title="Notifications"
-            onClick={() => toast("Heart, Skeleton, Nervous System and viscera models are ready.")}
+            onClick={() => toast("Heart, viscera, nervous system and cell models are ready.")}
             className="relative flex size-9 items-center justify-center rounded-xl border border-[var(--glass-border)] bg-white/70 text-muted-foreground transition-colors hover:text-primary dark:bg-white/10"
           >
             <Bell className="size-4" strokeWidth={1.8} />

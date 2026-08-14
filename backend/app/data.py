@@ -493,6 +493,198 @@ MODULES = [
             ),
         ],
     },
+    {
+        "id": "mitochondria",
+        "title": "Mitochondria",
+        "description": "Inspect membranes, cristae, matrix and mitochondrial DNA on the organelle model.",
+        "category": "Cells",
+        "difficulty": "Intermediate",
+        "lesson_count": 4,
+        "concepts": 12,
+        "estimate": "1h 10m",
+        "icon": "atom",
+        "accent": "from-[oklch(0.88_0.08_75)] to-[oklch(0.93_0.05_40)]",
+        "glb_url": "/mitochondria_-_cell_organelles.glb",
+        "isolate_nodes": [],
+        "lessons": [
+            _lesson(
+                "orientation",
+                "01",
+                "Meet the mitochondrion",
+                "16 min",
+                "Beginner",
+                "Shape, outer membrane and why eukaryotic cells keep so many of these organelles.",
+                ["Outer membrane", "Double membrane", "Energy organelle", "Number per cell"],
+                "Orbit the model until the bean-shaped shell is clear. The outer membrane faces the cytosol and is relatively "
+                "porous. Cells with high ATP demand — muscle, neurons — pack mitochondria densely. Hide neighbouring granules "
+                "if they crowd the outline, then compare this cutaway with a whole-cell view later.",
+            ),
+            _lesson(
+                "cristae",
+                "02",
+                "Cristae and inner membrane",
+                "20 min",
+                "Intermediate",
+                "Why the inner membrane folds, and where the electron-transport chain sits.",
+                ["Inner membrane", "Cristae", "Surface area", "Electron-transport chain"],
+                "Select the cristae. Folding multiplies membrane area so more ATP synthase and respiratory complexes can fit. "
+                "The inner membrane is far less leaky than the outer one — that tightness is what lets a proton gradient form. "
+                "Rotate until a single fold stands away from the shell.",
+            ),
+            _lesson(
+                "matrix",
+                "03",
+                "Matrix reactions",
+                "18 min",
+                "Intermediate",
+                "The inner compartment where the citric-acid cycle runs.",
+                ["Matrix", "Citric-acid cycle", "Enzymes", "Pyruvate oxidation"],
+                "The matrix is the space enclosed by the inner membrane. Pyruvate, fatty acids and amino acids are oxidised here; "
+                "NADH and FADH2 then feed the inner-membrane chain. Select the matrix and hide the shell briefly so the volume "
+                "is obvious, then show the shell again to restore context.",
+            ),
+            _lesson(
+                "genome",
+                "04",
+                "mtDNA and granules",
+                "16 min",
+                "Advanced",
+                "Mitochondrial DNA loops and the dense granules stored in the matrix.",
+                ["Mitochondrial DNA", "Granules", "Endosymbiosis", "Maternal inheritance"],
+                "Find the DNA strands inside the matrix — circular genomes left from a bacterial ancestor. Granules store ions "
+                "and proteins. Mitochondria encode only a handful of their own proteins; most subunits are imported from the "
+                "nucleus. Ask the tutor to focus each DNA loop, then the granules.",
+            ),
+        ],
+    },
+    {
+        "id": "plant-cell",
+        "title": "Plant Cell",
+        "description": "Compare wall, chloroplasts, vacuole and endomembrane organelles on the plant-cell model.",
+        "category": "Cells",
+        "difficulty": "Beginner",
+        "lesson_count": 4,
+        "concepts": 14,
+        "estimate": "1h 15m",
+        "icon": "leaf",
+        "accent": "from-[oklch(0.88_0.08_145)] to-[oklch(0.93_0.04_110)]",
+        "glb_url": "/plant_cell_-_cell_structure.glb",
+        "isolate_nodes": [],
+        "lessons": [
+            _lesson(
+                "orientation",
+                "01",
+                "Wall, membrane and layout",
+                "18 min",
+                "Beginner",
+                "How a plant cell is boxed by a wall, then organised inside the cytoplasm.",
+                ["Cell wall", "Plasma membrane", "Cytoplasm", "Plant vs animal"],
+                "Start with the cell wall — the rigid outer box animal cells lack. The plasma membrane lines it. Cytoplasm fills "
+                "the interior around organelles. Orbit until wall, cytoplasm and the large vacuole read as nested compartments, "
+                "not a single blob.",
+            ),
+            _lesson(
+                "energy",
+                "02",
+                "Chloroplasts and mitochondria",
+                "20 min",
+                "Beginner",
+                "Photosynthesis and respiration as two energy organelles in the same cell.",
+                ["Chloroplast", "Thylakoids", "Mitochondria", "ATP and sugars"],
+                "Select a chloroplast: inner and outer regions mark the double membrane. Light reactions live in thylakoid "
+                "membranes; the sugars they make are oxidised in mitochondria. A plant cell needs both. Hide the wall if it "
+                "blocks the view, then show it again so you do not lose the cell boundary.",
+            ),
+            _lesson(
+                "endomembrane",
+                "03",
+                "Nucleus and endomembrane",
+                "22 min",
+                "Intermediate",
+                "Nucleus, ER, Golgi and how proteins move through the system.",
+                ["Nucleus", "Rough ER", "Smooth ER", "Golgi apparatus"],
+                "The nucleus holds the genome. Rough ER is studded with ribosomes and makes membrane and secreted proteins; "
+                "smooth ER handles lipids. Vesicles carry cargo to the Golgi apparatus for sorting. Trace nucleus → rough ER → "
+                "Golgi on the model before naming enzymes.",
+            ),
+            _lesson(
+                "connections",
+                "04",
+                "Vacuole, peroxisomes and plasmodesmata",
+                "16 min",
+                "Intermediate",
+                "Storage, detox and the channels that link neighbouring plant cells.",
+                ["Vacuole", "Peroxisome", "Lysosome", "Plasmodesma"],
+                "The central vacuole stores water and solutes and keeps turgor. Peroxisomes handle oxidative reactions; lysosomes "
+                "digest. Plasmodesmata are cytoplasmic channels through the wall — select one and relate it to how plant tissues "
+                "share signals without gap junctions.",
+            ),
+        ],
+    },
+    {
+        "id": "animal-cell",
+        "title": "Animal Cell",
+        "description": "Tour membrane, nucleus, endomembrane system and energy organelles on the animal-cell model.",
+        "category": "Cells",
+        "difficulty": "Beginner",
+        "lesson_count": 4,
+        "concepts": 14,
+        "estimate": "1h 20m",
+        "icon": "microscope",
+        "accent": "from-[oklch(0.88_0.06_250)] to-[oklch(0.93_0.04_200)]",
+        "glb_url": "/animal_cell_2.0_-_annotated_in_english.glb",
+        "isolate_nodes": [],
+        "lessons": [
+            _lesson(
+                "orientation",
+                "01",
+                "Membrane and cytoplasm",
+                "16 min",
+                "Beginner",
+                "An animal cell has a plasma membrane and cytosol, but no cellulose wall.",
+                ["Plasma membrane", "Cytoplasm", "No cell wall", "Organelle crowding"],
+                "Select the plasma membrane — the outer boundary. Cytoplasm fills the interior. Unlike the plant-cell module, "
+                "there is no rigid wall, so shape is set by the cytoskeleton and junctions. Orbit the cutaway until membrane "
+                "versus interior organelles are obvious.",
+            ),
+            _lesson(
+                "nucleus",
+                "02",
+                "Nucleus and nucleolus",
+                "20 min",
+                "Beginner",
+                "The nuclear envelope, the nucleoplasm and the nucleolus that assembles ribosomes.",
+                ["Nucleus", "Nuclear envelope", "Nucleolus", "Chromatin"],
+                "Find the nucleus, then the nucleolus inside it. The nuclear envelope is a double membrane with pores. rRNA is "
+                "made in the nucleolus and shipped out to build ribosomes. Hide cytoplasm if the envelope is hard to see, then "
+                "restore it so the nucleus stays in cellular context.",
+            ),
+            _lesson(
+                "endomembrane",
+                "03",
+                "ER, Golgi and vesicles",
+                "22 min",
+                "Intermediate",
+                "The endomembrane highway from synthesis to secretion.",
+                ["Rough ER", "Smooth ER", "Golgi apparatus", "Vesicles"],
+                "Rough ER makes proteins for membranes and export; smooth ER makes lipids. The Golgi stacks modify and sort "
+                "cargo into secretory vesicles, endosomes and lysosomes. Click each compartment in order: rough ER, Golgi, "
+                "then a vesicle. Ask the tutor to hide neighbours if the stack is crowded.",
+            ),
+            _lesson(
+                "power",
+                "04",
+                "Energy, recycling and protein synthesis",
+                "22 min",
+                "Intermediate",
+                "Mitochondria, lysosomes, peroxisomes, centrioles and ribosomes working together.",
+                ["Mitochondrion", "Lysosome", "Peroxisome", "Ribosomes", "Centrosome"],
+                "Mitochondria supply ATP. Lysosomes digest; peroxisomes detoxify. Ribosomes are the small dots that read mRNA — "
+                "select Ribosomes to highlight the set. The centrosome and centrioles organise microtubules for mitosis. "
+                "Compare this layout with the plant-cell module: same core organelles, no chloroplast or wall.",
+            ),
+        ],
+    },
 ]
 
 

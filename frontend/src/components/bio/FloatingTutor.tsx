@@ -1,10 +1,10 @@
 import { Html } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { Bot, ExternalLink, Send, Sparkles, X } from "lucide-react";
-import { useMemo, useRef, useState, type FormEvent, type ReactNode } from "react";
+import { useRef, useState, type FormEvent, type ReactNode } from "react";
 import type { Group, Object3D } from "three";
 import { Box3, Vector3 } from "three";
-import { namesMatch, sourceName } from "@/lib/model-hierarchy";
+import { partMatches, sourceName } from "@/lib/model-hierarchy";
 import { explainPart } from "@/lib/part-explainers";
 import type { ChatMessage, TutorImage, TutorSource } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -13,7 +13,7 @@ function findObject(root: Object3D, name: string) {
   let match: Object3D | undefined;
   root.traverse((node) => {
     if (match) return;
-    if (namesMatch(sourceName(node), name) || namesMatch(node.name, name)) match = node;
+    if (partMatches(sourceName(node), name) || partMatches(node.name, name)) match = node;
   });
   return match;
 }
@@ -28,7 +28,6 @@ export function TutorAnchor({
   children: ReactNode;
 }) {
   const groupRef = useRef<Group>(null);
-  const offset = useMemo(() => new Vector3(0.28, 0.2, 0.14), []);
 
   useFrame(() => {
     const target = findObject(root, selectedName);
@@ -36,36 +35,32 @@ export function TutorAnchor({
     if (!target || !group) return;
     const box = new Box3().setFromObject(target);
     if (box.isEmpty()) return;
+    const size = new Vector3();
+    box.getSize(size);
     box.getCenter(group.position);
+    group.position.y += size.y * 0.08;
   });
 
   return (
     <group ref={groupRef}>
-      <mesh>
-        <sphereGeometry args={[0.014, 18, 18]} />
-        <meshBasicMaterial color="#1a5f8a" />
-      </mesh>
-      <line>
-        <bufferGeometry>
-          <bufferAttribute
-            attach="attributes-position"
-            args={[new Float32Array([0, 0, 0, offset.x, offset.y, offset.z]), 3]}
-          />
-        </bufferGeometry>
-        <lineBasicMaterial color="#1a5f8a" transparent opacity={0.75} />
-      </line>
-      <Html
-        position={[offset.x, offset.y, offset.z]}
-        occlude={false}
-        zIndexRange={[40, 0]}
-        style={{ pointerEvents: "auto" }}
-      >
-        <div
-          onPointerDown={(event) => event.stopPropagation()}
-          onClick={(event) => event.stopPropagation()}
-          className="-translate-y-1/2"
-        >
-          {children}
+      <Html occlude={false} zIndexRange={[50, 0]} style={{ pointerEvents: "none" }} center={false}>
+        <div className="relative h-0 w-0">
+          <span className="absolute -left-1.5 -top-1.5 size-3 rounded-full bg-primary shadow-sm ring-2 ring-white dark:ring-white/80" />
+          <div
+            className="pointer-events-auto absolute left-4 top-2"
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
+          >
+            <span
+              aria-hidden
+              className="absolute -left-[7px] top-5 h-0 w-0 border-y-[7px] border-r-[8px] border-y-transparent border-r-[var(--glass-border)]"
+            />
+            <span
+              aria-hidden
+              className="absolute -left-[6px] top-5 z-10 h-0 w-0 border-y-[6px] border-r-[7px] border-y-transparent border-r-white/95 dark:border-r-black/70"
+            />
+            {children}
+          </div>
         </div>
       </Html>
     </group>
@@ -98,7 +93,7 @@ export function TutorGuideCard({
   }
 
   return (
-    <div className="w-[min(20.5rem,72vw)] rounded-2xl border border-[var(--glass-border)] bg-white/90 p-3 shadow-lift backdrop-blur-xl dark:bg-black/55">
+    <div className="w-[min(18.5rem,70vw)] rounded-2xl border border-[var(--glass-border)] bg-white/95 p-3 shadow-lift backdrop-blur-xl dark:bg-black/70">
       <div className="flex items-start gap-2">
         <span className="relative mt-0.5 flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-primary-foreground">
           <Bot className="size-4" strokeWidth={1.8} />
